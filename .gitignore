@@ -1,0 +1,8 @@
+# Backend
+backend/target/
+backend/.env
+
+# Frontend
+frontend/smart-campus-ui/node_modules/
+frontend/smart-campus-ui/.env
+frontend/smart-campus-ui/dist/
