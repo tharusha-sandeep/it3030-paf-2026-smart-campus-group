@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -122,9 +123,29 @@ const AdminDashboardPage = () => {
   const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState("dashboard");
   const [chartView, setChartView] = useState("month");
+  const [resourceCount, setResourceCount] = useState("...");
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const res = await axiosInstance.get("/api/resources");
+        setResourceCount(res.data.length.toString());
+      } catch (err) {
+        console.error("Failed to load resource count", err);
+      }
+    };
+    fetchResources();
+  }, []);
 
   const handleLogout = () => { logout(); navigate("/login"); };
   const initials = user?.name ? user.name[0].toUpperCase() : "A";
+
+  const handleNavClick = (id) => {
+    setActiveNav(id);
+    if (id === "dashboard") navigate("/admin/dashboard");
+    else if (id === "resources") navigate("/resources");
+    // Add other navigations here as needed
+  };
 
   // ── Stat cards config ────────────────────────────────────────────────────────
   const STATS = [
@@ -133,7 +154,7 @@ const AdminDashboardPage = () => {
       iconColor: "#3b82f6",
       iconBg: "#eff6ff",
       label: "TOTAL RESOURCES",
-      value: "240",
+      value: resourceCount,
       badge: { text: "+4.2%", color: "#16a34a", bg: "#dcfce7" },
     },
     {
@@ -480,7 +501,7 @@ const AdminDashboardPage = () => {
               <button
                 key={item.id}
                 style={s.navItem(activeNav === item.id)}
-                onClick={() => setActiveNav(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <NavIcon size={17} strokeWidth={activeNav === item.id ? 2.25 : 1.75} />
                 {item.label}
@@ -513,7 +534,7 @@ const AdminDashboardPage = () => {
             <button style={s.exportBtn}>
               <Download size={15} /> Export Report
             </button>
-            <button style={s.newResourceBtn}>
+            <button style={s.newResourceBtn} onClick={() => navigate("/resources")}>
               <Plus size={15} /> New Resource
             </button>
             <button style={s.bellBtn} aria-label="Notifications">

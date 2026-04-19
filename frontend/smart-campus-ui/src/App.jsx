@@ -4,6 +4,7 @@ import { useAuth } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AdminRoute from "./auth/AdminRoute";
 import { getRoleBasedPath } from "./utils/navigation";
+import { Toaster } from "react-hot-toast";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -13,6 +14,7 @@ import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import ResourcesPage from "./pages/ResourcesPage";
 
 /**
  * Redirects authenticated users to their role-specific dashboard,
@@ -26,6 +28,7 @@ const DefaultRedirect = () => {
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
@@ -35,6 +38,8 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Protected Routes — any authenticated user */}
+        <Route path="/resources" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
+        
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>

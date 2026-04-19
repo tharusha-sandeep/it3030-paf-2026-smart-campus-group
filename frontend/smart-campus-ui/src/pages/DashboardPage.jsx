@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -62,6 +63,36 @@ const STATS = [
   },
 ];
 
+const getDynamicStats = (resourceCount) => [
+  {
+    color: "#3b82f6",
+    bg: "#eff6ff",
+    emoji: "📅",
+    label: "UPCOMING BOOKINGS",
+    value: "3",
+    sub: "scheduled this week",
+    badge: null,
+  },
+  {
+    color: "#f97316",
+    bg: "#fff7ed",
+    emoji: "📦",
+    label: "AVAILABLE RESOURCES",
+    value: resourceCount,
+    sub: "items ready",
+    badge: { text: "INVENTORY", color: "#f97316", bg: "#fff7ed" },
+  },
+  {
+    color: "#ef4444",
+    bg: "#fff1f2",
+    emoji: "🔔",
+    label: "SYSTEM ALERTS",
+    value: "5",
+    sub: "unread updates",
+    badge: { text: "ACTION REQUIRED", color: "#fff", bg: "#ef4444" },
+  },
+];
+
 // ── Mock booking data ─────────────────────────────────────────────────────────
 const BOOKINGS = [
   {
@@ -105,6 +136,19 @@ const DashboardPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState("dashboard");
+  const [resourceCount, setResourceCount] = useState("...");
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const res = await axiosInstance.get("/api/resources");
+        setResourceCount(res.data.filter(r => r.status === 'ACTIVE').length.toString());
+      } catch (err) {
+        console.error("Failed to fetch available resources", err);
+      }
+    };
+    fetchResources();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -112,6 +156,13 @@ const DashboardPage = () => {
   };
 
   const initials = user?.name ? user.name[0].toUpperCase() : "U";
+
+  const handleNavClick = (id) => {
+    setActiveNav(id);
+    if (id === "dashboard") navigate("/dashboard");
+    else if (id === "resources") navigate("/resources");
+    // Add other navigations here as needed
+  };
 
   // ── Styles ──────────────────────────────────────────────────────────────────
   const layout = {
@@ -586,7 +637,7 @@ const DashboardPage = () => {
               <button
                 key={item.id}
                 style={layout.navItem(activeNav === item.id)}
-                onClick={() => setActiveNav(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <NavIcon size={17} strokeWidth={activeNav === item.id ? 2.25 : 1.75} />
                 {item.label}
@@ -643,7 +694,7 @@ const DashboardPage = () => {
 
           {/* Stat Cards */}
           <div style={layout.statsRow}>
-            {STATS.map((st) => (
+            {getDynamicStats(resourceCount).map((st) => (
               <div key={st.label} style={layout.statCard()}>
                 <div style={layout.statIconBox(st.bg)}>{st.emoji}</div>
                 <span style={layout.statLabel(st.color)}>{st.label}</span>
@@ -696,7 +747,7 @@ const DashboardPage = () => {
                 <button style={layout.outlineBtn}>
                   Book a Room <ArrowRight size={15} />
                 </button>
-                <button style={{ ...layout.outlineBtn, marginBottom: 0 }}>
+                <button style={{ ...layout.outlineBtn, marginBottom: 0 }} onClick={() => navigate("/resources")}>
                   Browse Catalog <ArrowRight size={15} />
                 </button>
               </div>
