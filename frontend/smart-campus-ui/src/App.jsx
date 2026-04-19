@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import AdminRoute from "./auth/AdminRoute";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -8,6 +9,7 @@ import AuthCallbackPage from "./pages/AuthCallbackPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 function App() {
   return (
@@ -19,10 +21,20 @@ function App() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-        {/* Protected Routes */}
+        {/* Protected Routes — any authenticated user */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
+
+        {/* Admin-only Route */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          }
+        />
 
         {/* Default Redirects */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
