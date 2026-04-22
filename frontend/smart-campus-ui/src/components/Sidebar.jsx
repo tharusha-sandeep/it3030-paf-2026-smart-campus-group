@@ -23,14 +23,18 @@ const Sidebar = ({ activeId }) => {
     navigate("/login");
   };
 
+  // Shared items: Dashboard and Resources are visible to everyone
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: isAdmin ? "/admin/dashboard" : "/dashboard" },
     { id: "resources", label: "Resources", icon: Package, path: "/resources" },
-    { id: "bookings",  label: "Bookings",  icon: CalendarDays, path: "/bookings" },
-    { id: "tickets",   label: "Tickets",   icon: Ticket, path: "/tickets" },
   ];
 
-  if (isAdmin) {
+  if (!isAdmin) {
+    // Regular users see Bookings (their own) and Tickets
+    navItems.push({ id: "bookings", label: "Bookings", icon: CalendarDays, path: "/bookings" });
+    navItems.push({ id: "tickets",  label: "Tickets",  icon: Ticket, path: "/tickets" });
+  } else {
+    // Admins see Manage Bookings and Users
     navItems.push({ id: "admin-bookings", label: "Manage Bookings", icon: CalendarDays, path: "/admin/bookings" });
     navItems.push({ id: "users", label: "Users", icon: Users, path: "/users" });
   }

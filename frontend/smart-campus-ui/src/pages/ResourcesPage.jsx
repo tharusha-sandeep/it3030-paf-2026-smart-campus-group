@@ -32,6 +32,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import ProfileDropdown from "../components/ProfileDropdown";
+import NewBookingModal from "../components/NewBookingModal";
 
 const NAVY = "#1e3a5f";
 const NAVY_DARK = "#122a47";
@@ -49,7 +50,22 @@ const formatType = (type) => typeConfig[type]?.label || type;
 const ResourcesPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = user?.role === "ADMIN" || user?.role === "ROLE_ADMIN";
+  
+  // Debug user object to see role format
+  console.log("Current User:", user);
+
+  const isAdmin = user?.role === "ADMIN" || 
+                  user?.role === "ROLE_ADMIN" || 
+                  (user?.roles && user.roles.includes("ROLE_ADMIN"));
+
+  const isUser = user?.role === 'ROLE_USER' || 
+                 user?.role === 'USER' || 
+                 user?.role === 'user' ||
+                 (user?.roles && (
+                   user.roles.includes('ROLE_USER') || 
+                   user.roles.includes('USER')
+                 ));
+
   const initials = user?.name ? user.name[0].toUpperCase() : "U";
 
   // Data State
@@ -71,6 +87,8 @@ const ResourcesPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [targetDelete, setTargetDelete] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [preSelectedId, setPreSelectedId] = useState(null);
 
   // ── Availability Scheduler State ──────────────────────────────────────────
   const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -317,6 +335,7 @@ const ResourcesPage = () => {
     viewBtn: { background: "none", border: "none", color: NAVY, fontWeight: "600", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", padding: 0 },
     actionRow: { display: "flex", gap: "8px" },
     iconBtn: (danger) => ({ width: "32px", height: "32px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", border: danger ? "1px solid #fecaca" : "1px solid #e2e8f0", backgroundColor: "white", color: danger ? "#ef4444" : "#64748b", cursor: "pointer", transition: "all 0.2s" }),
+    bookBtn: { display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "8px", border: "none", backgroundColor: "#3b82f6", color: "white", fontSize: "0.8125rem", fontWeight: "600", cursor: "pointer", transition: "background 0.2s" },
     updatedText: { fontSize: "0.75rem", color: "#94a3b8", alignSelf: "flex-start", marginTop: "10px" },
 
     // SKELETON
@@ -532,9 +551,21 @@ const ResourcesPage = () => {
                       </div>
                       
                       <div style={s.cardFooter} onClick={(e) => e.stopPropagation()}>
-                        <button style={s.viewBtn} onClick={() => setSelectedResource(res)}>
-                          <Eye size={16} /> View Details
-                        </button>
+                        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                          <button style={s.viewBtn} onClick={() => setSelectedResource(res)}>
+                            <Eye size={16} /> View Details
+                          </button>
+                          {isUser && res.status === 'ACTIVE' && (
+                            <button 
+                              style={s.bookBtn} 
+                              onClick={() => { setPreSelectedId(res.id); setShowBookingModal(true); }}
+                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#3b82f6"}
+                            >
+                              <CalendarDays size={14} /> Book Now
+                            </button>
+                          )}
+                        </div>
                         {isAdmin && (
                           <div style={s.actionRow}>
                             <button 
@@ -755,6 +786,18 @@ const ResourcesPage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── NEW BOOKING MODAL ── */}
+      {showBookingModal && (
+        <NewBookingModal 
+          preSelectedResourceId={preSelectedId} 
+          onClose={() => setShowBookingModal(false)} 
+          onSuccess={() => {
+            setShowBookingModal(false);
+            fetchResources();
+          }}
+        />
       )}
 
       {/* Internal Styles for animations */}

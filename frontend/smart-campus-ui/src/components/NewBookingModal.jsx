@@ -5,13 +5,13 @@ import { X, Loader2 } from "lucide-react";
 
 const NAVY = "#1e3a5f";
 
-const NewBookingModal = ({ onClose, onSuccess }) => {
+const NewBookingModal = ({ onClose, onSuccess, preSelectedResourceId }) => {
   const [resources, setResources] = useState([]);
   const [loadingResources, setLoadingResources] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    resourceId: "",
+    resourceId: preSelectedResourceId || "",
     bookingDate: "",
     startTime: "",
     endTime: "",
