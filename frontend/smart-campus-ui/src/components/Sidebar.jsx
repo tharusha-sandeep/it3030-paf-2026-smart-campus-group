@@ -36,7 +36,7 @@ const Sidebar = ({ activeId }) => {
     navItems.push({ id: "users", label: "Users", path: "/admin/users", icon: Users });
   } else {
     navItems.push({ id: "bookings", label: "My Bookings", path: "/bookings", icon: CalendarDays });
-    navItems.push({ id: "tickets", label: "Support Tickets", path: "/tickets", icon: Ticket });
+    navItems.push({ id: "support", label: "Support Tickets", path: "/support", icon: Ticket });
   }
 
   const styles = {
@@ -196,10 +196,20 @@ const Sidebar = ({ activeId }) => {
           <Settings size={18} />
           <span>Settings</span>
         </NavLink>
-        <NavLink to="/help" style={styles.navLink(activeId === "help")}>
-          <HelpCircle size={18} />
-          <span>Support</span>
-        </NavLink>
+        
+        {isAdmin ? (
+          <NavLink to="/admin/support" style={styles.navLink(activeId === "admin-support")}>
+            {activeId === "admin-support" && <div style={styles.activeBorder} />}
+            <Ticket size={18} />
+            <span>Support Tickets</span>
+          </NavLink>
+        ) : (
+          <NavLink to="/support" style={styles.navLink(activeId === "support")}>
+            {activeId === "support" && <div style={styles.activeBorder} />}
+            <HelpCircle size={18} />
+            <span>Support</span>
+          </NavLink>
+        )}
       </div>
 
       <div style={styles.bottomSection}>
