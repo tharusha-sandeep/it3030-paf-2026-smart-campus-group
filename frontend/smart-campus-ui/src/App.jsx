@@ -17,6 +17,7 @@ import TicketListPage from "./pages/tickets/TicketListPage";
 import CreateTicketPage from "./pages/tickets/CreateTicketPage";
 import TicketDetailPage from "./pages/tickets/TicketDetailPage";
 import AdminTicketsPage from "./pages/admin/AdminTicketsPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const DefaultRedirect = () => {
   const { isAuthenticated, user } = useAuth();
@@ -40,6 +41,7 @@ function App() {
           <Route path="/tickets" element={<TicketListPage />} />
           <Route path="/tickets/create" element={<CreateTicketPage />} />
           <Route path="/tickets/:id" element={<TicketDetailPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
 
         {/* Admin-only Routes */}

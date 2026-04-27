@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { icon: Package,         label: "Resources",     id: "resources",      path: null },
   { icon: CalendarDays,    label: "Bookings",      id: "bookings",       path: null },
   { icon: Ticket,          label: "Tickets",       id: "tickets",        path: "/tickets" },
-  { icon: Bell,            label: "Notifications", id: "notifications",  path: null },
+  { icon: Bell, label: "Notifications", id: "notifications", path: "/notifications" },
   { icon: UserCircle,      label: "Profile",       id: "profile",        path: null },
 ];
 
